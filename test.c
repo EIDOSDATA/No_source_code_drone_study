@@ -103,3 +103,63 @@ void calcMotorSpeed()
     motorD_speed : Yaw 출력값의 방향 반대 / Roll 출력값의 방향과 동일 / Pitch 출력값의 방향과 반대
     */
 }
+
+
+/* 2중 PID
+
+표준 PID 로는 드론을 제대로 띄울 수 없었다.
+드론이 기울어긴 순간에 다시 제 자리로 돌아기기 위해서는 두가지 요소가 고려되야 하기 때문이다.
+
+첫번째 : 현재 상테에서의 오차이다. 오차에 따라 모터의 속도가 달라지게 된다.
+두번째 : 현재 상테에서의 회전속도. 회전속도와 방향도 모터의 속도에 영향을 주게 된다.
+
+// Git Hub 그림 필요함
+
+Roll 제어를 이중 루프 PID 제어.
+일차적으로 가속도 센서를 통해 얻은 각도 오차에 대해 P, I 값으 한다.
+자이로 센서를 통해 얻은 각속도 오차에 대해 P, I 값을 구하고 최종적으로 더해 출력값을 계산한다.
+
+*/
+
+
+
+float roll_target_angle = 0.0;
+float roll_angle_in;
+float roll_rate_in;
+float roll_stabilize_kp;
+float roll_stabilize_ki;
+float roll_rate_kp;
+float roll_rate_ki;
+float roll_stabilize_iterm;
+float roll_rate_iterm;
+float rolll_output;
+
+float pitch_target_angle = 0.0;
+float pitch_angle_in;
+float pitch_rate_in;
+float pitch_stabilize_kp;
+float pitch_stabiliz_ki;
+float pitch_rate_kp;
+float pitch_rate_ki;
+float pitch_stabilize_iterm;
+float pitch_rate_iterm;
+float pitch_output;
+
+float yaw_target_angle = 0.0;
+float yaw_angle_in;
+float yaw_rate_in;
+float yaw_stabilize_kp;
+float yaw_stabilize_ki;
+float yaw_rate_kp;
+float yaw_rate_ki;
+float yaw_stabilize_iterm;
+float yaw_rate_iterm;
+float yaw_output;
+
+// 표준 PID 방식에 각도와 각속도 매개 변수가 추가되었다.
+// 일반 비례항, 적분항과 같이 안정화 비례항, 적분항이 추가되었다. 미분항은 사용하지 않는다.
+
+// 이중 PID는 ANGLE PID Controller 이후 Rate PID Controller를 거친다.
+/*
+인입 각도(Roll, Pitch)는 상보필터로 구한 값을 넣고, 인입 각속도(Yaw)는 자이로 센서로부터 얻은 값을 넣는다.
+*/

@@ -10,7 +10,7 @@
 
 volatile long int cnt_rising=0;
 volatile long int cnt_falling=0;
-volatile long int cnt_elev=0;    // ¸Ş¸ğ¸® º¯¼ö ¼±¾ğ (ÀÎÅÍ·´Æ®¿¡¼­ ¾²ÀÌ´Â º¯¼öµé)
+volatile long int cnt_elev=0;     // ë©”ëª¨ë¦¬ ë³€ìˆ˜ ì„ ì–¸ (ì¸í„°ëŸ½íŠ¸ì—ì„œ ì“°ì´ëŠ” ë³€ìˆ˜ë“¤)
 volatile long int cnt_aile=0;
 volatile long int cnt_thro=0;
 volatile long int cnt_rudd=0;
@@ -22,18 +22,18 @@ volatile unsigned int N_RXDATA;
 
 void PORT_init()
 {
-    DDRD = 0x00;     // INT0,1 ¼ö½Å¹æÇâÀ¸·Î ¼³Á¤
-    PORTD = 0b00000011;    // INT0,1 ³»ºÎ Ç®¾÷ÀúÇ× »ç¿ë
+    DDRD = 0x00;     // INT0,1 ìˆ˜ì‹ ë°©í–¥ìœ¼ë¡œ ì„¤ì •
+    PORTD = 0b00000011;    // INT0,1 ë‚´ë¶€ í’€ì—…ì €í•­ ì‚¬ìš©
     
-    DDRE = 0b00000010;     // INT 4,5 ¼ö½Å¹æÇâÀ¸·Î ¼³Á¤
-    PORTE = 0b11100000;   // INT4,5 ³»ºÎ Ç®¾÷ÀúÇ× »ç¿ë
+    DDRE = 0b00000010;     // INT 4,5 ìˆ˜ì‹ ë°©í–¥ìœ¼ë¡œ ì„¤ì •
+    PORTE = 0b11100000;   // INT4,5 ë‚´ë¶€ í’€ì—…ì €í•­ ì‚¬ìš©
     
-    EIMSK = 0b11100011;    // INT 0,1,4,5 ¿ÜºÎÀÎÅÍ·´Æ® °³º° Çã¿ë
-    EICRA = 0b00001111;    // INT 0,1 - rising edge Æ®¸®°Å ¼³Á¤
-    EICRB = 0b11111100;    // INT 5,6,7 - rising edge Æ®¸®°Å ¼³Á¤
+    EIMSK = 0b11100011;    // INT 0,1,4,5 ì™¸ë¶€ì¸í„°ëŸ½íŠ¸ ê°œë³„ í—ˆìš©
+    EICRA = 0b00001111;    // INT 0,1 - rising edge íŠ¸ë¦¬ê±° ì„¤ì •
+    EICRB = 0b11111100;    // INT 5,6,7 - rising edge íŠ¸ë¦¬ê±° ì„¤ì •
 }
 
-interrupt [EXT_INT0] void ext_int0_isr(void)   // ELEV Ã¤³Î ¼ö½Å
+interrupt [EXT_INT0] void ext_int0_isr(void)   // ELEV ì±„ë„ ìˆ˜ì‹ 
 {
     if(EICRA == 0b00001111){
         cnt_rising = TCNT1;
@@ -46,7 +46,7 @@ interrupt [EXT_INT0] void ext_int0_isr(void)   // ELEV Ã¤³Î ¼ö½Å
     }
 }
 
-interrupt [EXT_INT1] void ext_int1_isr(void)   // AILE Ã¤³Î ¼ö½Å
+interrupt [EXT_INT1] void ext_int1_isr(void)   // AILE ì±„ë„ ìˆ˜ì‹ 
 {
     if(EICRA == 0b00001111){
         cnt_rising = TCNT1;
@@ -59,7 +59,7 @@ interrupt [EXT_INT1] void ext_int1_isr(void)   // AILE Ã¤³Î ¼ö½Å
     }
 }
 
-interrupt [EXT_INT6] void ext_int6_isr(void)   // THRO Ã¤³Î ¼ö½Å
+interrupt [EXT_INT6] void ext_int6_isr(void)   // THRO ì±„ë„ ìˆ˜ì‹ 
 {
     if(EICRB == 0b11111100){
         cnt_rising = TCNT1;
@@ -72,7 +72,7 @@ interrupt [EXT_INT6] void ext_int6_isr(void)   // THRO Ã¤³Î ¼ö½Å
     }
 }
 
-interrupt [EXT_INT7] void ext_int7_isr(void)   // RUDD Ã¤³Î ¼ö½Å
+interrupt [EXT_INT7] void ext_int7_isr(void)   // RUDD ì±„ë„ ìˆ˜ì‹ 
 {
     if(EICRB == 0b11111100){
         cnt_rising = TCNT1;
@@ -85,7 +85,7 @@ interrupt [EXT_INT7] void ext_int7_isr(void)   // RUDD Ã¤³Î ¼ö½Å
     }
 }
 
-interrupt [EXT_INT5] void ext_int5_isr(void)   // AUX2 Ã¤³Î ¼ö½Å
+interrupt [EXT_INT5] void ext_int5_isr(void)   // AUX2 ì±„ë„ ìˆ˜ì‹ 
 {
     if(EICRB == 0b11111100){
         cnt_rising = TCNT1;
@@ -98,7 +98,7 @@ interrupt [EXT_INT5] void ext_int5_isr(void)   // AUX2 Ã¤³Î ¼ö½Å
     }        
 }
 
-void UART0_init()      // ÇÏÀÌÆÛÅÍ¹Ì³Î¿ë
+void UART0_init()      // í•˜ì´í¼í„°ë¯¸ë„ìš©
 {
     delay_ms(10);
     DDRE |= 0b00000010;
@@ -111,7 +111,7 @@ void UART0_init()      // ÇÏÀÌÆÛÅÍ¹Ì³Î¿ë
 void UART0_putch(unsigned char ch)
     {while((UCSR0A & 0x20) == 0); UDR0 = ch;} 
 
-void UART1_init(void)   // ¼¾¼­ Åë½Å¿ë
+void UART1_init(void)   // ì„¼ì„œ í†µì‹ ìš©
 {
     delay_ms(10);
     DDRD |= 0b00001000; 
@@ -261,7 +261,7 @@ void main(void)
         //R_outer_Pgain = (float)(cnt_aux2 - 17590) * 0.000078125 * 10.0 + 3.0;
         //P_outer_Pgain = R_outer_Pgain;
 
-		// ¼¾¼­ ¼ö½Å ¹× ÆÄ½ÌºÎ
+		// ì„¼ì„œ ìˆ˜ì‹  ë° íŒŒì‹±ë¶€
         UART1_putstrf("<D\r\n");             
         while(ch != 0x0a) {}
         if(Buf[0] == 0x24)
@@ -303,23 +303,27 @@ void main(void)
         psi_dot_feedback = - VALID_DATA[9];
         
        // ROLL ANGLE Control ( ANG_P * RATE_PID controller )
-        ROLL_ANG_ERR = (float)(Roll_cmd) - (float)(phi_feedback);
-        ROLL_RATE_ERR = ROLL_ANG_ERR * R_outer_Pgain - phi_dot_feedback;
-        ROLL_RATE_P = ROLL_RATE_ERR * R_inner_Pgain;
+        ROLL_ANG_ERR = (float)(Roll_cmd) - (float)(phi_feedback);        
+        ROLL_RATE_ERR = ROLL_ANG_ERR * R_outer_Pgain - phi_dot_feedback; // ì•ˆì •í™” ê°’
+
+        ROLL_RATE_P = ROLL_RATE_ERR * R_inner_Pgain; // ì•ˆì •í™” ê°’
         ROLL_RATE_I = ROLL_RATE_I + (ROLL_RATE_ERR * R_inner_Igain) * SamplingTime;
         Limit_cut(&ROLL_RATE_I,-500,500);
-        ROLL_RATE_D = (ROLL_RATE_ERR - ROLL_RATE_ERR_PRE)/SamplingTime * R_inner_Dgain;
-        ROLL_RATE_ERR_PRE = ROLL_RATE_ERR;
-        
+        ROLL_RATE_D = (ROLL_RATE_ERR - ROLL_RATE_ERR_PRE)/SamplingTime * R_inner_Dgain; 
+               
+        ROLL_RATE_ERR_PRE = ROLL_RATE_ERR;        
+
         roll_cont = ROLL_RATE_P + ROLL_RATE_I + ROLL_RATE_D;
         
         // PITCH ANGLE Control ( ANG_P * RATE_PID controller )
         PITCH_ANG_ERR = (float)(Pitch_cmd) - (float)(theta_feedback);
         PITCH_RATE_ERR = PITCH_ANG_ERR * P_outer_Pgain - theta_dot_feedback;
+
         PITCH_RATE_P = PITCH_RATE_ERR * P_inner_Pgain;
         PITCH_RATE_I = PITCH_RATE_I + (PITCH_RATE_ERR * P_inner_Igain) * SamplingTime;
         Limit_cut(&PITCH_RATE_I,-500,500);
         PITCH_RATE_D = (PITCH_RATE_ERR - PITCH_RATE_ERR_PRE)/SamplingTime * P_inner_Dgain;
+
         PITCH_RATE_ERR_PRE = PITCH_RATE_ERR;
         
         pitch_cont = PITCH_RATE_P + PITCH_RATE_I + PITCH_RATE_D;
@@ -331,7 +335,7 @@ void main(void)
         Limit_cut(&YAW_RATE_I,-500,500);
 		yaw_cont = YAW_RATE_P + YAW_RATE_I;
         
-		//¸ğÅÍÁ¦¾î°ªÀ¸·Î ¹Í½Ì
+		//ëª¨í„°ì œì–´ê°’ìœ¼ë¡œ ë¯¹ì‹±
         f1 = 0.5*pitch_cont + 0.5*roll_cont - yaw_cont + (float)(Throttle);
 	    f2 = 0.5*pitch_cont - 0.5*roll_cont + yaw_cont + (float)(Throttle);
 	    f3 = - 0.5*pitch_cont - 0.5*roll_cont - yaw_cont + (float)(Throttle);
@@ -342,7 +346,7 @@ void main(void)
         Limit_cut(&f3,0,16000);
         Limit_cut(&f4,0,16000);
 
-		// THROTTLE 0 ±ÙÃ³·Î ³·Ãß¸é ½Ãµ¿ ²û.
+		// THROTTLE 0 ê·¼ì²˜ë¡œ ë‚®ì¶”ë©´ ì‹œë™ ë”.
         if(cnt_thro < 16050 && cnt_thro > 15900 )
         {
             f1 = 0;
