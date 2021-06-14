@@ -1,8 +1,7 @@
 # Drone PID Study
 <h1 align="center">PID 알고리즘 이해하기</h1>
-![image](https://user-images.githubusercontent.com/48746729/121832266-a6fb9180-cd04-11eb-8e19-e09455ad33fb.png)
 
-<p align="center"><img src="https://www.pigno.se/static/assets/images/octocat.svg" width="240" /></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121832266-a6fb9180-cd04-11eb-8e19-e09455ad33fb.png" width="240" /></p>
 
 <p align="center">Quick learn How to use the Git</p>
 
