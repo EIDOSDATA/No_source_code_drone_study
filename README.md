@@ -1,34 +1,48 @@
 # Drone PID Study
 <h1 align="center">PID 알고리즘 이해하기</h1>
 
-<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121832266-a6fb9180-cd04-11eb-8e19-e09455ad33fb.png" width="240" /></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121832266-a6fb9180-cd04-11eb-8e19-e09455ad33fb.png" width="720" /></p>
 
-<p align="center">Quick learn How to use the Git</p>
+<p align="center">PID 블록 다이어그램</p>
 
- ```bash
-$ git add .
-```
+## :pencil2: 설명
 
-- ignore 파일이나, 삭제한 파일 이력까지 커밋을 하실 경우, `-f` 옵션을 이용합니다.
+- PID는 비례(Proportion), 적분(Integral), 미분(Differential) 를 통한 제어 기법이다.
+- 기본적으로 피드백 구조로 되어 있다.
 
- ```bash
-$ git add . -f
-```
 
-- `git remote show origin`을 통해 origin에 리모트 주소가 잘 등록되었는지 확인해보세요.
+### :pencil2: 특징
+- 제어하고자 하는 대상의 입력 값(INPUT)을 측정하여 이를 목표 설정값(SetPoint)과 비교하여 오차를 계산한다.
+- 이 때 오차값을 이용하여 제어에 필요한 제어값(OUTPUT)을 계산하고, 이 제어값은 다시 피드백 되어 제어하고자 하는 대상의 입력으로 사용되는 구조다.
 
- ![Remote show origin](https://www.pigno.se/static/assets/images/git_tutorial_refer_remote_origin.png)
+쉽게 날려서 설명하자면 입력 >> 목표치 도달설정 >> 오차값으로 필요 제어량 계산 >> 피드백 이다.
 
-## :pencil2: 소스 커밋
 
-- 소스를 커밋하시면 `staged` 상태의 파일이 히스토리로 기록되고 적재됩니다.
-- 파일 추적상태의 경우 `git status` 명령을 이용해서 확인합니다.
+### :pencil2: 수식 이해하기
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121833193-c7c4e680-cd06-11eb-9dfa-8901c80c30a6.png" width="480" /></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121833277-f478fe00-cd06-11eb-9636-39aa591a04ed.png" width="320" /></p>
 
-```bash
-$ git status
-```
+<b>각각의 역할은 다음과 같다.</b>
 
-- `git add` 이후 `git status`를 하면 아래와 같은 화면이 나옵니다.
+- 비례항 : 현제 상태에서의 오차 값의 크기에 비례한 제어를 한다.
+- 적분항 : 일정한 상태로 유지되는 오차를 없애는 작용한 한다.
+- 미분항 : 출력값의 급격한 변화에 제동을 걸어 목표값을 지나가 버리는 오버슛을 줄여 안정성을 향상시킨다.
+
+<h3>비례, 적분, 미분 제어에 따른 변화</h3>
+<b>1. 초기상태</b>
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121833943-79184c00-cd08-11eb-9b52-c76e71d6b625.png"/></p>
+
+<b>2. 비례항 (P)</b>
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121834379-9a2d6c80-cd09-11eb-873a-474651935e34.png"/></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121834035-b7157000-cd08-11eb-887d-6c5513558dbd.png"/></p>
+
+3. 적분항 (I)
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121834405-b204f080-cd09-11eb-9593-198c1de62f16.png"/></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121834056-c72d4f80-cd08-11eb-8f63-ba9040e10676.png"/></p>
+
+4. 미분항 (D)
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121834433-c0eba300-cd09-11eb-97b0-51f59ebbf13f.png"/></p>
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121834082-d3b1a800-cd08-11eb-9ab2-5f6a52307599.png"/></p>
 
  ![Git add files](https://www.pigno.se/static/assets/images/git_tutorial_refer_add.png)
 
