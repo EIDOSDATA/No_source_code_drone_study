@@ -225,23 +225,37 @@ motor_4_speed = (throttle == 0) ? 0 : throttle + y_output + r_output - p_output;
 
 ```
 ## :tada: 이중 PID 적용하기
-### 기본 개념 코드
+### 기본 개념 코드 / 
+<p align="center"><img src="https://user-images.githubusercontent.com/48746729/121863390-c57a8080-cd36-11eb-84b0-40d73d82d768.png" width="480" /></p>
 
 ```C
 float rc_angle_cmd; // rc 수신기의 명령
 float current_angle; // 현재 각도 x,y,z 어디준 하나
 float current_angular_velocity; // 현재 각 속도
 
-float 
+float angle_error; // 명령값과 기체의 각도와의 에러 계산값
+float rate_error; // P제어 결과와 현재 기체의 각속도 에러 계산값
+float pre_rate_error; // 이전에 계산한 P제어 결과와 현재 기체의 각속도 에러값
 
-float angle_error;
-float x_error; // Roll:r, Pitch:p, Yaw:y
+float stabilize_P_GAIN;
+float stabilize_I_GAIN;
+float stabilize_D_GAIN;
+
+float angle_rate_p;
+float angle_rate_i;
+float angle_rate_d;
+
+float dt; //sensor time
+float pid_out; // 
 
 angle_error = rc_angle_cmd - current_angle; // 1. 수신기의 명령값과 현재 기체 각도와의 차이를 계산
-x_error = (angle_error * stabilize_P_GAIN) - current_angular_velocity; // 2. 1에서 계산한 에러를 P제어 한 결과와 현재 기체의 각 속도와의 에러를 계산
+rate_error = (angle_error * stabilize_P_GAIN) - current_angular_velocity; // 2. 1에서 계산한 에러를 P제어 한 결과와 현재 기체의 각 속도와의 에러를 계산
 
+angle_rate_p = rate_error * rate_P_GAIN;
+angle_rate_i += (rate_error * dt) * rate_I_GAIN;
+angle_rate_d = ((rate_error - pre_rate_error) / dt) * rate_D_GAIN;
 
-
+pid_out = angle_rate_p + angle_rate_i + angle_rate_d;
 
 ```
 
