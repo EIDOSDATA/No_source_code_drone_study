@@ -58,19 +58,173 @@
  
 ## :tada: 표준 PID 알고리즘
 
-- 상대방이 커밋한 파일은 명령어를 통해서 직접 업데이트를 하셔야 동기화가 됩니다.
-- 이때 사용하는 명령어는 `git pull`과 `git fetch`가 있습니다.
+- 기본 코드다.
+- 지글러 니콜스 방식이 적용되지 않아 있으므로 알고리즘만 대강 알아두면 된다.
+- 이런 알고리즘을 Roll, Pith, Yaw 에 각각 해당하도록 만들면 된다. 
 
 ```C
-# master 브랜치를 pull하여 업데이트
-$ git pull origin master
-  
-# master 브랜치를 fetch하여 업데이트
-$ git fetch origin master
+float setpoint; // 목표값
+float input; // 수신받은값
+float prev_input; // 이전에 수신 받은 값
+
+float kp; // 비례 매개변수
+float ki; // 적분 매개변수
+float kd; // 미분 매개변수
+
+float pterm; // 비례항
+float iterm; // 적분항
+float dterm; // 미분항
+
+float output; // 출력값
+float err; // 에러값
+float dinput; // 변화량(오차율) 계산용
+
+err = setpoint - input;    // 오차 = 설정값 - 현재값
+dInput = input - prev_input; // 변화량 = 입력값 - 이전 입력값
+prev_input = input;          // 다움 주기에 사용하기 위해서 현재 입력값 저장
+
+// PID 제어
+pterm = kp * error;        // 비례항 / P제어
+iterm += ki * error * dt;  // 적분항 : 현재 오차와 센서 입력 주기(dt) 값을 곱함 >> IMU 센서 주기 
+dterm = -kd * dInput / dt; // 미분항 : 외력에 의한 변경이므로 setpoint에 의한 내부적인 요소를 제외해야함. (-) 추가
+
+output = pterm + iterm + dterm // Output 값으로 PID 요소를 합산함.
+// >> motor1 = output(roll, pitch, yaw) sum.
+
+
+/* 시퀀스 설명
+1. 오차를 구함
+2. 변화를 측정하고 다움 주기에 사용하기 위한 값 저장
+3. PID 구함
+    3.1 P항 >> 비례매개변수 * 현재 오차
+    3.2 I항은 시간에 건친 오차의 합으로 >> I항 = I항 + (적분 매개변수 * 현재 오차 * 센서주기)
+    3.3 D항은 오차의 변화율 계산이므로 >> 미분 매개변수 * 변화량 / 센서주기
+        >> dterm = -kd * (input-prev_input) / dt
+4. 미분항 부호가 음수인 이유
+    미분항은 갑작스러운 외력의 변화에 저항하기 위해 사용된다.
+    SetPoint의 변화 즉 내부적인 의도에 의한 변하에는 논리적으로 적용이 불가하다.
+    SetPoint가 변하는 상황을 미분항에서 빼면 부호가 바뀌게 된다.        
+*/
 ```
 
-- `pull` 과 `fetch` 의 차이점은 `merge` 작업을 하느냐 안하느냐로 나뉘어지며.
-- `pull` 은 `fetch` + `merge` 작업이라고 생각하시면 됩니다.
+
+- Roll, Pitch, Yaw 적용
+
+```C
+// MOTOR PARAMETER
+float motor_1_speed, motor_2_speed, motor_3_speed, motor_4_speed;
+volatile long int cnt_rising = 0;
+volatile long int cnt_falling = 0;
+
+volatile long int cnt_elev = 0;     
+volatile long int cnt_aile = 0;
+volatile long int cnt_thro = 0;
+volatile long int cnt_rudd = 0;
+volatile long int cnt_aux2 = 0;
+
+// ROLL Variable
+float r_tgt_angle; // 목표값
+float r_input_y; // 수신받은값
+float r_prev_input_y; // 이전에 수신 받은 값
+
+float r_pterm; // 비례항
+float r_iterm; // 적분항
+float r_dterm; // 미분항
+
+float r_p; // 비례 매개변수 >> GAIN
+float r_i; // 적분 매개변수 >> GAIN
+float r_d; // 미분 매개변수 >> GAIN
+
+float r_err; // 에러값
+float r_d_input; // 변화량(오차율) 계산용
+float r_output; // 모터에 대한 출력값
+
+// PITCH Variable
+float p_tgt_angle; // 목표값
+float p_input_x; // 수신받은값
+float p_prev_input_x; // 이전에 수신 받은 값
+
+float p_pterm; // 비례항
+float p_iterm; // 적분항
+float p_dterm; // 미분항
+
+float p_p; // 비례 매개변수 >> GAIN
+float p_i; // 적분 매개변수 >> GAIN
+float p_d; // 미분 매개변수 >> GAIN
+
+float p_err; // 에러값
+float p_d_input; // 변화량(오차율) 계산용
+float p_output; // 모터에 대한 출력값
+
+// YAW Variable
+float y_tgt_angle; // 목표값
+float y_input_z; // 수신받은값
+float y_prev_input_z; // 이전에 수신 받은 값
+
+float y_pterm; // 비례항
+float y_iterm; // 적분항
+float y_dterm; // 미분항
+
+float y_p; // 비례 매개변수 >> GAIN
+float y_i; // 적분 매개변수 >> GAIN
+float y_d; // 미분 매개변수 >> GAIN
+
+float y_err; // 에러값
+float y_d_input; // 변화량(오차율) 계산용
+float y_output; // 모터에 대한 출력값
+
+// ROLL PID 제어
+r_err = r_tgt_angle - r_input;    // 오차 = 설정값 - 현재값
+r_d_input = r_input_y - r_prev_input_y; // 변화량 = 입력값 - 이전 입력값
+r_prev_input_y = r_input_y;          // 다음 주기에 사용하기 위해서 현재 입력값 저장
+
+r_pterm = r_p * r_error;        // 비례항 / P제어
+r_iterm += r_i * r_err * dt;  // 적분항 : 현재 오차와 센서 입력 주기(dt) 값을 곱함 >> IMU 센서 주기 
+r_dterm = -r_d * r_d_input / dt; // 미분항 : 외력에 의한 변경이므로 setpoint에 의한 내부적인 요소를 제외해야함. (-) 추가
+
+r_output = r_pterm + r_iterm + r_dterm // Output 값으로 PID 요소를 합산함.
+
+// PITCH PID 제어
+p_err = p_tgt_angle_x - p_input_x;    // 오차 = 설정값 - 현재값
+p_d_input = p_input_x - p_prev_input_x; // 변화량 = 입력값 - 이전 입력값
+p_prev_input_x = p_input_x;          // 다음 주기에 사용하기 위해서 현재 입력값 저장
+
+p_pterm = p_p * p_err;        // 비례항 / P제어
+p_iterm += p_i * p_err * dt;  // 적분항 : 현재 오차와 센서 입력 주기(dt) 값을 곱함 >> IMU 센서 주기 
+p_dterm = -p_d * p_d_input / dt; // 미분항 : 외력에 의한 변경이므로 setpoint에 의한 내부적인 요소를 제외해야함. (-) 추가
+
+p_output = y_pterm + y_iterm + y_dterm // Output 값으로 PID 요소를 합산함.
+
+// YAW PID 제어
+y_err = y_tgt_angle_z - y_input_z;    // 오차 = 설정값 - 현재값
+y_d_input = y_input_z - y_prev_input_z; // 변화량 = 입력값 - 이전 입력값
+y_prev_input_z = y_input_z;          // 다음 주기에 사용하기 위해서 현재 입력값 저장
+
+y_pterm = y_p * y_err;        // 비례항 / P제어
+y_iterm += y_i * y_err * dt;  // 적분항 : 현재 오차와 센서 입력 주기(dt) 값을 곱함 >> IMU 센서 주기 
+y_dterm = -y_d * y_d_input / dt; // 미분항 : 외력에 의한 변경이므로 setpoint에 의한 내부적인 요소를 제외해야함. (-) 추가
+
+y_output = y_pterm + y_iterm + y_dterm // Output 값으로 PID 요소를 합산함.
+
+// "+" 자형 쿼드콥터
+//>> +++, --+, +--, -+-
+motor_1_speed = (throttle == 0) ? 0 : throttle + y_output + r_output + p_output;
+motor_2_speed = (throttle == 0) ? 0 : throttle - y_output - r_output + p_output;
+motor_3_speed = (throttle == 0) ? 0 : throttle + y_output - r_output - p_output;
+motor_4_speed = (throttle == 0) ? 0 : throttle - y_output + r_output - p_output;
+
+// "x" 자형 쿼드콥터
+//>> -++, +-+, ---, ++-
+motor_1_speed = (throttle == 0) ? 0 : throttle - y_output + r_output + p_output;
+motor_2_speed = (throttle == 0) ? 0 : throttle + y_output - r_output + p_output;
+motor_3_speed = (throttle == 0) ? 0 : throttle - y_output - r_output - p_output;
+motor_4_speed = (throttle == 0) ? 0 : throttle + y_output + r_output - p_output;
+
+// motor_n_speed 로 PWM 제어를 한다.
+// throttle 신호는 PWM으로 받아온다.
+
+```
+
 
 
 ## :mag: 라이센스
