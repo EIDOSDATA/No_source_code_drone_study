@@ -171,16 +171,16 @@ void main(void)
     float f4 = 0;
     
     //Roll control
-    long int Roll_cmd             = 0;
-    long int phi_feedback         = 0;
-    long int phi_dot_feedback     = 0;
-    float roll_cont               = 0;
-    float ROLL_ANG_ERR            = 0;
+    long int Roll_cmd             = 0; // setpoint
+    long int phi_feedback         = 0; // 수신받은값
+    long int phi_dot_feedback     = 0; // 이전에 수신받은깂
+    float roll_cont               = 0; // output
+    float ROLL_ANG_ERR            = 0; // 에러값
     float ROLL_RATE_ERR           = 0;
     float ROLL_RATE_P             = 0;
     float ROLL_RATE_I             = 0;
     float ROLL_RATE_D             = 0;
-    float ROLL_RATE_ERR_PRE       = 0;
+    float ROLL_RATE_ERR_PRE       = 0; // 이전 에러값
 
     float R_inner_Pgain           = 0.10; // 2015.02.20
     float R_inner_Igain           = 0.35;
